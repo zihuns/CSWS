@@ -1,0 +1,14 @@
+{% extends "accounts/base_accounts.html" %}
+
+{% block title %}MYPAGE{% endblock title %}
+
+{% block content %}
+<div>
+	<h2 class="MYPAGE">MYPAGE</h2>
+	<form method= "POST" action="{% url 'delete_container' %}">
+		{% csrf_token %}
+		<button class="container_delete">Container Delete</button>
+	</form>
+</div>
+
+{% endblock content %}

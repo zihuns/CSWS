@@ -1,0 +1,62 @@
+        <div class="container pt-5">
+
+            <!-- select lang -->
+            <form method="POST" id="post-form">
+                {% csrf_token %}
+                <div class="form-group">
+                <label>Language</label>
+                <select class="form-control" name="lang" id="lang">
+                    <option value="PYTHON" selected>Python (python 3.7)</option>
+                    <option value="R">R (RScript 3.6.2)</option>
+
+                    <option value="C">C (gcc 4.8.4)</option>
+                    <option value="CPP" >C++ (g++ 4.8.4)</option>
+                    <option value="CSHARP">C# (mono 3.2.8)</option>
+                    <option value="JAVA">Java (openjdk 1.7.0_09)</option>
+
+                    <option value="JAVASCRIPT">JavaScript (Rhino 1.7)</option>
+                    <option value="PHP">PHP (php 5.5.9)</option>
+
+                    <option value="GO">Go (go 1.4.2)</option>
+
+                    <option value="TEXTFILE">Text</option>
+                </select>
+                </div>
+                
+
+            <!-- edit source Code -->
+                <div>
+                        <label>code</label>
+                        <a class="" id="download">
+                            download code
+                            <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                        </a>
+                        <pre id="editor"></pre>
+                        <textarea class="form-control" id="code" placeholder="code" rows =0 style="display:none;"></textarea>     
+                        <!-- <textarea class="form-control" id="code" placeholder="code" rows =0 ></textarea>      -->
+
+
+                </div>
+
+                <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+            </form>
+
+            <button class="btn btn-success" id="runcode"  data-toggle="tooltip" data-placement="top" title="Compile and Run">Compile and Run</button>                 
+            <!-- <button name="button" id="download">download</button> -->
+
+
+
+            <div class="row mb-2 posts">
+                    <!-- {% for post in posts %}
+                    <div class="col-md-6">
+                        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                            <div class="col p-4 d-flex flex-column position-static">
+                                <h3 class="mb-0">{{post.lang}}</h3>
+                                <p class="mb-auto">{{post.code}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %} -->
+            </div>
+
+        </div>

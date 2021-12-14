@@ -1,0 +1,22 @@
+{% extends "boards/base_boards.html" %}
+
+{% block title %}{{ subject.title }}{% endblock title %}
+
+{% block content %}
+<div>
+	<h2>{{ subject.subject.title }}</h2>
+</div>
+
+{% if user == subject.admin %}
+<div>
+	<a href="{% url 'boards:assignment_new' title=subject.subject.title year=subject.year class_no=subject.class_no %}"><button>새 과제</button></a>
+</div>
+{% endif %}
+
+
+{% for assignment in assignments %}
+<a href="{% url 'boards:assignment_detail' title=subject.subject.title year=subject.year class_no=subject.class_no pk=assignment.pk %}">{{ assignment.title }}(기한: {{ assignment.due_date }})</a><br>
+{% endfor %}
+
+
+{% endblock content %}

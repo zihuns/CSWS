@@ -1,0 +1,86 @@
+{% extends 'webs/create.html' %}
+{% block replace %}
+<CENTER>
+<div class="jumbotron">
+  <h1 class="display-4">Welcome to DataList<br>Hello {{ user_pr.이름 }}</h1>
+  <p class="lead">its an awesome profile picture</p>
+  <hr class="my-4">
+  <img src="{{ user_pr.파일.url }}" class="image_responsive" height="100px" width="100px">
+  <a class="icon file" draggable="true" href="{{ user_pr.파일.url }}" download>{{ user_pr.파일.url }}</a></td>
+  <p>
+    {{ user_pr.파일.url }}<BR>
+   You have learned some awesome technologies like {{ user_pr.전공 }}</p>
+</div>
+
+<script language="javascript">
+  
+  function addRow(tableid) {
+
+    var table = document.getElementById(tableid);
+
+    var rowlen = table.rows.length;
+
+    //var row = table.insertRow();		// IE와 Chrome 동작을 달리함.
+
+    var row = table.insertRow(rowlen-1);	// HTML에서의 권장 표준 문법
+
+    row.insertCell(0).innerHTML = "첫번째";
+
+    row.insertCell(1).innerHTML = "{{ user_pr.파일.url }}";
+
+    row.insertCell(2).innerHTML = "세번째";
+
+    row.insertCell(3).innerHTML = "네번째";
+
+  }
+
+</script>
+
+<table id='table1' width='400' border="1" align="center">
+
+<colgroup>
+
+  <col width='15%' />
+
+  <col width='25%' />
+
+  <col width='30%' />
+
+  <col width='30%' />
+
+
+</colgroup>
+
+
+
+<tr id='row1'>
+
+  <td align='center'> # </td>
+
+  <td align='center'> 파일명 </td>
+
+  <td align='center'> 날짜 </td>
+
+  <td align='center'> 크기 </td>
+
+
+</tr>
+
+<tr id='row2'>
+
+  <td align='center' colspan='4'> 
+
+    <input type='button' value='데이터를 테이블에 추가' onClick='addRow("table1")' />
+
+  </td>
+
+</tr>
+
+
+
+
+</CENTER>
+{% endblock %}
+
+
+  

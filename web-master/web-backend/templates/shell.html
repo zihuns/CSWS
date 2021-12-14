@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SHELL{% endblock title %}
+
+{% block content %}
+{% if is_created == True %} <!-- 생성 시도가 이루어졌을 때 --->
+    {% if container_ip != "" %} <!-- IP가 배정되었다면 --->
+    <h4>Initial ID : {{ user.get_username }} / Initial PW : password</h4>
+    <iframe src="http://172.16.163.38:{{ container_port }}" width="100%" height="1000" frameBorder="0" scrolling="no"> Shellinabox </iframe>
+
+    {% else %} <!-- IP가 배정되지 않았다면 --->
+    <h2 class="creating_container">We are creating Container now.<br>Please try again.<br>It will take about 2 minutes.</h2>
+    {% endif %}
+
+    {% else %} <!-- 생성 시도가 없었다면 --->
+    {% if container_ip != "" %}
+
+<h2 class="problem_container"> Problem Occured!<br>Please delete your container in Mypage. </h2>
+    {% else %}
+
+<h2 class="check_container">CREATE CONTAINER NOW. CHECK PLEASE.</h2>
+
+<div class="wrapper_os">
+    <div class="logo_os">
+        <img src="{% static 'base/img/centos.png' %}" width="80px" height="80px">
+    </div>
+    <div class="explain_os">
+        <p>CentOS7 1907</p>
+    </div>   
+    <form method= "POST" action="{% url 'create_container' %}">
+        {% csrf_token %}
+        <button name="os" value="centos7" class="submit_container">Build</button>
+    </form>
+</div>
+
+<div class="wrapper_os">
+    <div class="logo_os">
+        <img src="{% static 'base/img/ubuntu.png' %}" width="80px" height="80px">
+    </div>
+    <div class="explain_os">
+        <p>Ubuntu 16.04 LTS</p>
+    </div>   
+    <form method= "POST" action="{% url 'create_container' %}">
+        {% csrf_token %}
+        <button name="os" value="ubuntu16" class="submit_container">Build</button>
+    </form>
+</div>
+
+<div class="wrapper_os">
+    <div class="logo_os">
+        <img src="{% static 'base/img/ubuntu.png' %}" width="80px" height="80px">
+    </div>
+    <div class="explain_os">
+        <p>Ubuntu 18.04 LTS</p>
+    </div>   
+    <form method= "POST" action="{% url 'create_container' %}">
+        {% csrf_token %}
+        <button name="os" value="ubuntu18" class="submit_container">Build</button>
+    </form>
+</div>
+
+<div class="wrapper_os">
+    <div class="logo_os">
+        <img src="{% static 'base/img/ubuntu.png' %}" width="80px" height="80px">
+    </div>
+    <div class="explain_os">
+        <p>Ubuntu 20.04 LTS</p>
+    </div>   
+    <form method= "POST" action="{% url 'create_container' %}">
+        {% csrf_token %}
+        <button name="os" value="ubuntu20" class="submit_container">Build</button>
+    </form>
+</div>
+    {% endif %}
+
+{% endif %}
+
+{% endblock content %}

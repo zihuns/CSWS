@@ -1,0 +1,229 @@
+{% extends "boards/base_boards.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock title %}
+{% block style %}
+
+<style>
+	#id_text {
+		width:100%;
+	}
+</style>
+
+{% if post.contain_code %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="{% static 'webcompiler/css/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'webcompiler/css/my_style.css' %}" />
+
+<script src="{% static 'webcompiler/js/jquery-2.2.4.min.js' %}"></script>
+<script src="{% static 'webcompiler/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'webcompiler/ace-builds/src-noconflict/ace.js' %}"></script>
+
+
+<script>
+	var editor = null;
+	var source_code = null;
+	var selectedLang = "{{ post.lang }}";
+	
+	// --- initialize
+	$(document).ready(function(){
+		// download code
+		$("#download").click(function(){
+			download();
+		});
+
+		// change theme
+		$("#theme").change(function(){
+			changeTheme();
+		});
+
+		
+		readTextFile();
+		ace.require("ace/ext/language_tools");
+		editor = ace.edit("editor");
+		var ongoing = false;
+		editor.setTheme("ace/theme/dawn");
+		setLanguage();
+		document.getElementById("lang").value = selectedLang;
+		removeOtherLang();
+		editor.getSession().setTabSize(5);
+		editor.setFontSize(14);
+		editor.setValue(source_code);
+		editor.setReadOnly(true);
+		editor.session.getSelection().clearSelection();
+	});
+
+	function removeOtherLang() {
+		var count = document.getElementById("lang").options.length;
+		var selected = document.getElementById("lang").options.selectedIndex;
+		for(var i = 0; i < count; i++) {
+			if(i < selected) document.getElementById("lang").options.remove(0);
+			else if(i == selected) continue;
+			else document.getElementById("lang").options.remove(1);
+		}
+	}
+
+	function readTextFile() {
+		var rawFile = new XMLHttpRequest();
+		rawFile.open("GET", "{{ post.code_file_name }}", false);
+		rawFile.onreadystatechange = function() {
+			if(rawFile.readyState === 4) {
+				if(rawFile.status === 200 || rawFile.status === 0) {
+					source_code = rawFile.responseText;
+				}
+			}
+		}
+		rawFile.send(null);
+	}
+
+
+	//To get the current contents in the editor
+	function updateContent(){
+		source_code = editor.getValue();
+	}	
+
+	function download() {
+		updateContent();
+
+		var e = {
+			"C":"c","CPP":"cpp","CLOJURE":"clj","CSS":"css","CSHARP":"cs",
+			"GO":"go","HASKELL":"hs","JAVA":"java","JAVASCRIPT":"js",
+			"LISP":"scm","OBJECTIVEC":"m","PERL":"pl","PHP":"php",
+			"PYTHON":"py","RUBY":"rb","R":"r","RUST":"rs","SCALA":"scala",
+			"TEXT":"txt"
+		};
+
+		var element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(source_code));
+		element.setAttribute('download', "file." + e[selectedLang]);
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+	}
+
+	// set language
+	function setLanguage() {
+		if(selectedLang == "C" || selectedLang == "CPP"){
+			editor.getSession().setMode("ace/mode/c_cpp");
+		}
+		else{
+			editor.getSession().setMode("ace/mode/" + selectedLang.toLowerCase());
+		}
+
+		editor.session.getSelection().clearSelection();
+	}
+
+	// When changing the theme
+	function changeTheme() {
+		themeSelected = $("#theme").val();
+		if(themeSelected == "Light"){
+			editor.setTheme("ace/theme/dawn");
+		}
+		else if(themeSelected == "Monokai"){
+			editor.setTheme("ace/theme/monokai");
+		}
+		else if(themeSelected == "Solarised Light"){
+			editor.setTheme("ace/theme/solarized_light");
+		}
+		else if(themeSelected == "Twilight"){
+			editor.setTheme("ace/theme/twilight");
+		}
+	}
+
+</script>
+{% endif %}
+
+{% endblock style %}
+
+
+
+{% block content %}
+
+<div>
+	<h2>{{ post.title }}</h2>
+	<h6>{{ post.author.name }} ({{ post.last_modified_date }})
+		{% if user == post.author %}
+			<a href="{% url 'boards:post_edit' title=post.subject.title pk=post.pk %}">수정</a>
+			<a href="{% url 'boards:post_delete' title=post.subject.title pk=post.pk %}">삭제</a>
+		{% endif %}
+	</h6>
+	
+	<p>{{ post.text | linebreaksbr }}</p>
+	
+
+	{% if post.contain_code %}
+	<div class="container pt-5" id="code-editor">
+
+		<div id="topbar">
+
+			<div class="lang-choose">
+				<select class="form-control" name="lang" id="lang">
+					<option value="PYTHON">Python (python 3.7)</option>
+					<option value="R">R (RScript 3.6.2)</option>
+					<option value="C">C (gcc 4.8.4)</option>
+					<option value="CPP" >C++ (g++ 4.8.4)</option>
+					<option value="CSHARP">C# (mono 3.2.8)</option>
+					<option value="JAVA">Java (openjdk 1.7.0_09)</option>
+					<option value="JAVASCRIPT">JavaScript (Rhino 1.7)</option>
+					<option value="PHP">PHP (php 5.5.9)</option>
+					<option value="GO">Go (go 1.4.2)</option>
+					<option value="TEXTFILE">Text</option>
+				</select>
+			</div> 
+			
+			<div id="settings">
+				<div class="theme-choose">
+					<select class="form-control" name="theme" id="theme">
+						<option value="Light" selected>Light</option>
+						<option value="Monokai">Monokai</option>
+						<option value="Solarised Light">Solarised Light</option>
+						<option value="Twilight">Twilight</option>
+					</select>
+				</div>
+
+				<a class="" id="download">
+					download code
+					<span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+				</a>
+			</div>
+			
+		</div>
+		
+		<textarea name="code" class="form-control" id="code" placeholder="code" rows="0" style="display:none;" ></textarea>
+		
+		<!-- <input type="code" class="form-control" id="code" rows="0"  ></textarea> -->
+
+		<pre id="editor"></pre>
+
+		<!-- <div id="editor-statusbar"></div> -->
+	</div>
+
+	{% endif %}
+
+
+</div>
+
+<br><br>
+
+<div>
+	<h3>Comments</h3>
+	{% for comment in comments %}
+		<div>
+		{{ comment.author }} ({{ comment.last_modified_date }})
+		{% if user == comment.author %}
+			<a href="{% url 'boards:comment_edit' title=post.subject.title p_pk=post.pk c_pk=comment.pk %}"><button method="GET">수정</button></a>
+			<a href="{% url 'boards:comment_delete' title=post.subject.title p_pk=post.pk c_pk=comment.pk %}"><button method="POST">삭제</button></a>
+		{% endif %}
+		<p>{{ comment.text | linebreaksbr }}</p>
+		</div>
+	{% endfor %}
+	<form method="POST">{% csrf_token %}
+		{{ form.as_p }}
+		<button type="submit">댓글달기</button>
+	</form>
+</div>
+
+
+
+{% endblock content %}

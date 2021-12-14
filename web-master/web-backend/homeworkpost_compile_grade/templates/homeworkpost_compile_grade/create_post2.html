@@ -1,0 +1,374 @@
+<html>
+    <head>
+        <title>Server-B homeworkpost_compile_grade</title>
+        {% load static %}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <!-- <style type="text/css" media="screen">
+            #editor { 
+                width: 100%;
+                height: 15rem; 
+            }
+        </style> -->
+
+        <link rel="stylesheet" type="text/css" href="{% static 'homeworkpost_compile_grade/css/bootstrap.min.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'homeworkpost_compile_grade/css/my_style.css' %}" />
+
+    </head>
+    
+    <body>
+        <div class="container pt-5">
+            <h2>과제 1 : 피라미드 만들기</h2>
+            <h3>입력받은 수 만큼 피라미드를 출력하시오</h3>
+            <h5>예시 1 : 입력받은 수가 2일때 </h5>
+            <pre>
+                 **
+            </pre>
+            <h5>예시 2 : 입력받은 수가 5일때 </h5>
+            <pre>            
+                 **
+                ****
+               ******
+              ********
+            </pre>
+
+        </div>
+        <div class="container pt-5">
+			<div id="topbar">
+				<div class="lang-choose">
+                    {% csrf_token %}
+
+					<select class="form-control" name="lang" id="lang">
+                        <option value="PYTHON" selected>Python (python 3.7)</option>
+                        <option value="R">R (RScript 3.6.2)</option>
+    
+                        <option value="C">C (gcc 4.8.4)</option>
+                        <option value="CPP" >C++ (g++ 4.8.4)</option>
+                        <option value="CSHARP">C# (mono 3.2.8)</option>
+                        <option value="JAVA">Java (openjdk 1.7.0_09)</option>
+    
+                        <option value="JAVASCRIPT">JavaScript (Rhino 1.7)</option>
+                        <option value="PHP">PHP (php 5.5.9)</option>
+    
+                        <option value="GO">Go (go 1.4.2)</option>
+    
+                        <option value="TEXTFILE">Text</option>
+                    </select>
+
+				</div> 
+                <div id="settings">
+                    <div class="theme-choose">
+                        <select class="form-control" name="theme" id="theme">
+                            <option value="Light" selected>Light</option>
+                            <option value="Monokai">Monokai</option>
+                            <option value="Solarised Light">Solarised Light</option>
+                            <option value="Twilight">Twilight</option>
+                        </select>
+                    </div> 
+                    <a class="" id="download">
+                        download code
+                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                    </a>
+                </div>
+            </div>
+            
+            <textarea class="form-control" id="code" placeholder="code" rows =0 style="display:none;"></textarea>     
+
+			<pre id="editor"></pre>
+
+			<div id="editor-statusbar">
+            </div>
+
+
+    		<div class="row">
+    			<div id="showres">
+
+    				<div style="margin-left:0%;"class="run-save-panel">
+	    				<button class="btn btn-success" id="runcode"  data-toggle="tooltip" data-placement="top" title="Compile and Run">Compile and Run</button>
+                        <button  id="grade"  data-toggle="tooltip" data-placement="top" title="grade">grade</button>
+                    </div>
+                    <!-- <button class="btn btn-success" id="runcode"  data-toggle="tooltip" data-placement="top" title="Compile and Run">Compile and Run</button> -->
+
+                    <!-- <div class="col-md-6">
+                        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                            <div class="col p-4 d-flex flex-column position-static">
+                                <h3 class="mb-0">여기에 인풋</h3>
+                                <p class="mb-auto">여기에 예시답안</p>
+                            </div>
+                        </div>
+                    </div> -->
+
+                </div>
+                
+    		</div> 
+
+    		<div class="row">
+				<div class="input-container">
+					<textarea id="custom-input" class="input-textarea" placeholder="Write inputs to program."></textarea>
+				</div>
+            </div> 
+            
+            <div class="row mb-2 posts">
+                <!-- {% for post in posts %}
+                <div class="col-md-6">
+                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                        <div class="col p-4 d-flex flex-column position-static">
+                            <h3 class="mb-0">{{post.lang}}</h3>
+                            <p class="mb-auto">{{post.code}}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %} -->
+             </div>
+
+    	</div> 
+
+    </body>
+
+    
+    <!-- <script src="/static/js/jquery-2.2.4.min.js"></script> -->
+    <script src="{% static 'homeworkpost_compile_grade/js/jquery-2.2.4.min.js' %}"></script>
+
+    <!-- <script src="/static/js/bootstrap.min.js"></script>	 -->
+    <script src="{% static 'homeworkpost_compile_grade/js/bootstrap.min.js' %}"></script>
+
+    <!-- <script src="/static/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script> -->
+    <script src="{% static 'homeworkpost_compile_grade/ace-builds/src-noconflict/ace.js' %}"></script>
+
+    <script>
+        $(document).ready(function(){
+
+            $("#download").click(function(){
+                updateContent();
+                download(source_code, $("#lang").val());
+
+            });
+            $("#runcode").click(function(){
+                runCode();
+            });
+
+            $("#grade").click(function(){
+                grade();
+            });
+
+
+            var language = {}
+            var selectedLang = "PYTHON"
+            language['PYTHON'] = "#피라미드 만들기 \n def pyramid(n) : ";
+            language['R'] = 'cat("Hello World")\n';
+
+            language['C'] = '#include <stdio.h>\n\nint main(void) \n{\n	printf("Hello World!\\n");\n	return 0;\n}\n';
+            language['CPP'] = '#include <iostream>\nusing namespace std;\n\nint main()\n{\n     cout << "Hello World!" << endl;\n     return 0;\n}\n';
+           	language['CSHARP'] = 'using System;\nusing System.Numerics;\nclass Test {\n	static void Main(string[] args)	{\n	   /*\n		* \n		Read input from stdin and provide input before running\n		var line1 = System.Console.ReadLine().Trim();\n		var N = Int32.Parse(line1);\n		for (var i = 0; i < N; i++) {\n		System.Console.WriteLine("hello world");\n		}\n		*/\n\n		System.Console.WriteLine("Hello World!\\n");\n	}\n}\n';
+            language['JAVA'] = 'class TestClass {\n    public static void main(String args[] ) throws Exception {\n        System.out.println("Hello World!");\n    }\n}\n';
+            
+            language['JAVASCRIPT'] = "importPackage(java.io);\nimportPackage(java.lang);\n\nprint ('Hello World!\\n');\n";
+            language['PHP'] = '<?php\n\necho "Hello World!";\n\n?>\n';
+            
+            language['GO'] = 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello World")\n}\n';
+
+            // document.getElementById("lang").innerHTML = selectedLang;
+            document.getElementById("code").innerHTML = language[selectedLang];
+
+            //When Changing the language
+            $("#lang").change(function(){
+                selectedLang = $("#lang").val();
+                document.getElementById("code").innerHTML = language[selectedLang];
+                editor.setValue(language[selectedLang],-1);
+
+                if(selectedLang == "C" || selectedLang == "CPP"){
+                    editor.getSession().setMode("ace/mode/c_cpp");
+                }
+                else{
+                    editor.getSession().setMode("ace/mode/" + selectedLang.toLowerCase());
+                }
+
+                editor.session.getSelection().clearSelection();
+            });
+
+            // When changing the theme
+            $("#theme").change(function(){
+                themeSelected = $("#theme").val();
+                if(themeSelected == "Light"){
+                    editor.setTheme("ace/theme/dawn");
+                }
+                else if(themeSelected == "Monokai"){
+                    editor.setTheme("ace/theme/monokai");
+                }
+                else if(themeSelected == "Solarised Light"){
+                    editor.setTheme("ace/theme/solarized_light");
+                }
+                else if(themeSelected == "Twilight"){
+                    editor.setTheme("ace/theme/twilight");
+                }
+            });
+
+            // ------From Ace Documentation on inserting the editor------//
+            ace.require("ace/ext/language_tools");
+            var editor = ace.edit("editor");
+            var ongoing = false;
+            var selectedLang = "PYTHON";
+            editor.setTheme("ace/theme/dawn");
+            editor.session.setMode("ace/mode/python");
+            editor.getSession().setTabSize(5);
+            var source_code = editor.getValue();
+            editor.setFontSize(14);
+            editor.setValue(language[selectedLang],-1);
+            var StatusBar = ace.require("ace/ext/statusbar").StatusBar;
+            var statusBar = new StatusBar(editor, document.getElementById("editor-statusbar"));
+
+            editor.session.getSelection().clearSelection();
+
+            function download(content,lang){
+                var e = {
+                    "C":"c","CPP":"cpp","CLOJURE":"clj","CSS":"css","CSHARP":"cs",
+                    "GO":"go","HASKELL":"hs","JAVA":"java","JAVASCRIPT":"js",
+                    "LISP":"scm","OBJECTIVEC":"m","PERL":"pl","PHP":"php",
+                    "PYTHON":"py","RUBY":"rb","R":"r","RUST":"rs","SCALA":"scala",
+                    "TEXT":"txt"
+                };
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+                element.setAttribute('download', "file." + e[lang]);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+                
+
+
+
+            //To get the current contents in the editor
+            function updateContent(){
+                source_code = editor.getValue();
+            }
+
+            function grade(){
+                updateContent();
+
+                var token = $(":input[name='csrfmiddlewaretoken']").val();
+                var run_data = {
+                        grade : 1,
+                        source: source_code,
+                        lang: selectedLang,
+                        csrfmiddlewaretoken:token
+                };
+                // AJAX request to Django for running code
+                $.ajax({
+                    type:'POST',
+                    url:'{% url "create2" %}',
+                    data:{
+                        grade: 1,
+                        lang:selectedLang,
+                        code:source_code,
+                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                        action: 'post'
+                    },
+                    success:function(json){
+                        document.getElementById("post-form");
+                        if(json.isthisallcorrected == 1){
+                            alert("정답입니다.");
+
+                        }else{ alert("오답입니다")}
+
+
+                        function countcorrect(obj) {
+                            var count = 0;
+                            for(var prop in obj) {
+                                if(obj[prop] == '정답')
+                                    ++count;
+                            }
+                            return count;
+                        }
+
+                        $(".posts").prepend('<div class="col-md-6">'+
+                            '<div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">' +
+                                '<div class="col p-4 d-flex flex-column position-static">' +
+                                    '<h3 class="mb-0">' + '테스트 결과' + json.correct.length +'개 중 ' + countcorrect(json.correct) +'개 성공'+'</h3>' +
+                                    '<h3 class="mb-0">' + json.correct + '</h3>' +
+                                    '<h3 class="mb-0">' + '기댓값' + '</h3>' +
+                                    '<pre>' + json.answer_output_list +'</pre>' +
+                                    '<h3 class="mb-0">' + '실행한 결과값' + '</h3>' +
+                                    '<pre>' + json.my_answer_output_list +'</pre>' +
+
+                                    // '<p class="mb-auto">' + json.code + '</p>' +
+                                    // '<pre id ="editor2">' + json.result + '</pre>' +
+
+                                    // '<textarea>' + json.code + '</textarea>' + //for line change '\n'
+                                '</div>' +
+                            '</div>' +
+                        '</div>' 
+                        )
+
+                    },
+                    error : function(xhr,errmsg,err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+                });
+
+            }
+
+            function runCode(){
+                // alert(" In runCode function");
+
+                // if(ongoing==true)
+                //     return;
+                // ongoing = true;
+                updateContent();
+
+                var token = $(":input[name='csrfmiddlewaretoken']").val();
+                var run_data = {
+                        grade : 0 ,
+                        source: source_code,
+                        lang: selectedLang,
+                        csrfmiddlewaretoken:token
+                };
+                // AJAX request to Django for running code
+                $.ajax({
+                    type:'POST',
+                    url:'{% url "create2" %}',
+                    data:{
+                        grade : 0,
+                        lang:selectedLang,
+                        code:source_code,
+                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                        action: 'post'
+                    },
+                    success:function(json){
+                        document.getElementById("post-form");
+                        $(".posts").prepend('<div class="col-md-6">'+
+                            '<div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">' +
+                                '<div class="col p-4 d-flex flex-column position-static">' +
+                                    '<h3 class="mb-0">' + json.lang + '</h3>' +
+                                    // '<p class="mb-auto">' + json.code + '</p>' +
+                                    '<pre id ="editor2">' + json.result + '</pre>' +
+
+                                    '<textarea>' + json.code + '</textarea>' + //for line change '\n'
+                                '</div>' +
+                            '</div>' +
+                        '</div>' 
+                        )
+
+                    },
+                    error : function(xhr,errmsg,err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+                });
+                
+	        }
+
+            // document.getElementById("runcode").onclick = function(){alert("hdddi")};
+
+        
+
+
+        });
+
+
+    </script>
+</html>

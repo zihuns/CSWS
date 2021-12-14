@@ -1,0 +1,6 @@
+<html>
+    <body>
+        {{ user }}님, 아래 링크를 클릭하여 계정을 활성화하세요.<br>
+        <a href="http://{{ domain }}{% url 'activate' uid token %}">http://{{ domain }}{% url 'activate' uid token %}</a>
+    </body>
+</html>

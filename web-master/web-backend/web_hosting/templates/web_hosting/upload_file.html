@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<script type="text/JavaScript" src="http://code.jquery.com/jquery-1.7.min.js"></script>
+<script language="javascript" type="text/javascript">
+
+  $(function(){
+       //전체선택 체크박스 클릭
+        $("#allCheck").click(function(){
+
+             //만약 전체 선택 체크박스가 체크된상태일경우 
+             if($("#allCheck").prop("checked")) {
+
+                //해당화면에 전체 checkbox들을 체크해준다 
+                $("input[type=checkbox]").prop("checked",true);
+
+            // 전체선택 체크박스가 해제된 경우 
+            } else {
+                //해당화면에 모든 checkbox들의 체크를해제시킨다. 
+                $("input[type=checkbox]").prop("checked",false); 
+            } 
+        }) 
+    })
+
+
+</script>
+
+<style>
+        div {
+            width: 100%;
+            height: 100%;
+        }
+        div.top {
+            width: 100%;
+            float: top;
+            box-sizing: border-box;
+           
+        }
+        div.bottom {
+            margin-top:70px;
+            width: 100%;
+            float: bottom;
+            box-sizing: border-box;
+        }
+
+        div.progress{
+            margin-top:20px;
+        }
+
+        .checkboxes input {
+                vertical-align: middle;
+            }
+
+
+        .upload_form{
+                margin-top:30px;
+        }    
+
+        .button_table{
+            margin-top:10px;
+        }
+
+
+        .upload_button{
+            margin-right:50px;
+        }
+
+        .delete_button{
+            margin-right:10px;
+        }
+        
+        .use{
+            margin-right:100px;
+        }
+</style>
+        
+<div>
+    <div class="top"  style="height: 100%">
+    <h2 align="center">Upload File</h2>
+
+        <form class="upload_form" action="" method="POST" enctype="multipart/form-data" style="width: 700px;">
+          {% csrf_token %}
+              {{ form }}
+
+    <table class="button_table" style="width: auto;">      
+    <tr>        
+        <td style="width: 80px" >
+            <button class="btn btn-primary" class="upload_button" type="submit" >Upload</button>
+            </form>
+        </td>
+
+        <td style="width: 100px" ><form method="POST" action="{% url 'delete_file' %}">
+                {% csrf_token %}
+            <button class="btn btn-primary" class="delete_button" type="submit">Delete</button>
+        </td>
+
+        <td style="width: 250px" colspan="2" class="use">사용 용량 : {{total_size|filesizeformat}}/{{max_size|filesizeformat}}
+        </td>
+
+        <td style="width: 250px" colspan="2">공유 위치 : <a href="media/{{ request.user }}/index.html" >web_hosting/media/{{ request.user }}</a>
+        </td>
+        
+    </tr>
+   
+    </table>
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: {{percent}}%;">
+                {{percent}}%
+                </div>
+            </div>
+    </div>
+
+    <div class="bottom">
+            <h2 align="center">File List</h2>
+            
+        <table class="table" align="center" >
+            <thead class="thead-dark">
+                <tr>
+                    <th align="right" border="1"><input type="checkbox" id="allCheck"></th>
+                    <th style="width: 45%;">이름</th>
+                    <th style="width: 33%;">날짜</th>
+                    <th style="width: 20%;">크기</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                   
+                {% for file in files %}
+                <tr>
+                    <td align="center"><input type="checkbox" name="pk" value={{ file.pk }} align="right"></td>
+                    <td><a href="{{ file.file.url }}" download>
+                        {{ file.file }}
+                    </a></td>
+                    <td style="width: 185px;">{{ file.날짜 }}</td>
+                    <td style="width: 80px;">{{ file.file.size|filesizeformat }}</td>
+                    
+                </tr>
+                {% endfor %}
+                    
+                </form>
+
+            </tbody>
+        </table>
+    
+    
+        </div>
+    </div>
+    
+{% endblock %}
+        
+    {% block script %}
+
+    
+    {% endblock %}
+    

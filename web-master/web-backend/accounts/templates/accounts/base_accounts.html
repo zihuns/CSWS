@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}BASE TEMPLATE RELATED ACCOUNTS{% endblock title %}
+
+{% block content %}
+<div>
+	<h2>{% block urlname %}ACCOUNTS TEMPLATE{% endblock urlname %}</h2>
+
+	<form action="{% block urlsetting %}{% endblock urlsetting %}" method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+		<input type="submit" value="{% block submit_value %}Login{% endblock submit_value %}" />
+
+	</form>
+</div>
+
+{% endblock content %}

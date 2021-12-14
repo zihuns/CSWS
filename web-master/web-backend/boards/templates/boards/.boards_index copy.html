@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}BOARDS{% endblock title %}
+
+{% block content %}
+<div>
+	<h2>Server-B Boards</h2><br>
+</div>
+
+<div>
+	<h1>1학년 1학기</h1>
+{% for subject in subjects1 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>1학년 2학기</h1>
+{% for subject in subjects2 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>2학년 1학기</h1>
+{% for subject in subjects3 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>2학년 2학기</h1>
+{% for subject in subjects4 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>3학년 1학기</h1>
+{% for subject in subjects5 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>3학년 2학기</h1>
+{% for subject in subjects6 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>4학년 1학기</h1>
+{% for subject in subjects7 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+<div>
+	<h1>4학년 2학기</h1>
+{% for subject in subjects8 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+{% if subjects9.0 is not None %}
+<div>
+	<h1>미분류</h1>
+{% for subject in subjects9 %}
+<div>
+	<h3><a href="{% url 'boards:subject_detail' title=subject.title %}">{{ subject.title }}</a></h3>
+</div>
+{% endfor %}
+<br>
+</div>
+{% endif %}
+
+{% endblock content %}

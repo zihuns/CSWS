@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Post{% endblock title %}
+
+{% block style %}
+<style>
+.code-editor-invisible {
+    display: none;
+}
+#id_title, #id_text {
+    width: 100%;
+}
+
+#id_text {
+    max-height: 100%;
+}
+
+.editor-container {
+    margin-bottom:1.5rem;
+}
+</style>
+
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="{% static 'webcompiler/css/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'webcompiler/css/my_style.css' %}" />
+
+
+	
+<script src="{% static 'webcompiler/js/jquery-2.2.4.min.js' %}"></script>
+<script src="{% static 'webcompiler/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'webcompiler/ace-builds/src-noconflict/ace.js' %}"></script>
+
+{% if post.contain_code %}
+<script>
+// 글에 코드가 포함되어 있을 때의 초기화
+$(document).ready(function(){
+    selectedLang = "{{ post.lang }}";
+    readTextFile();
+    showHideCodeEditor();
+    document.getElementById("lang").value = selectedLang
+});
+
+function readTextFile() {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "{{ post.code_file_name }}", false);
+    rawFile.onreadystatechange = function() {
+        if(rawFile.readyState === 4) {
+            if(rawFile.status === 200 || rawFile.status === 0) {
+                source_code = rawFile.responseText;
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
+</script>
+{% endif %}
+
+
+<script>
+    var editor = null;
+    var source_code = null;
+    var language = {}
+    var selectedLang = "PYTHON"
+    language['PYTHON'] = "print('Hello World!')\n";
+    language['R'] = 'cat("Hello World")\n';
+    language['C'] = '#include <stdio.h>\n\nint main(void) \n{\n	printf("Hello World!\\n");\n	return 0;\n}\n';
+    language['CPP'] = '#include <iostream>\nusing namespace std;\n\nint main()\n{\n     cout << "Hello World!" << endl;\n     return 0;\n}\n';
+    language['CSHARP'] = 'using System;\nusing System.Numerics;\nclass Test {\n	static void Main(string[] args)	{\n	   /*\n		* \n		Read input from stdin and provide input before running\n		var line1 = System.Console.ReadLine().Trim();\n		var N = Int32.Parse(line1);\n		for (var i = 0; i < N; i++) {\n		System.Console.WriteLine("hello world");\n		}\n		*/\n\n		System.Console.WriteLine("Hello World!\\n");\n	}\n}\n';
+    language['JAVA'] = 'class TestClass {\n    public static void main(String args[] ) throws Exception {\n        System.out.println("Hello World!");\n    }\n}\n';
+    language['JAVASCRIPT'] = "importPackage(java.io);\nimportPackage(java.lang);\n\nprint ('Hello World!\\n');\n";
+    language['PHP'] = '<?php\n\necho "Hello World!";\n\n?>\n';
+    language['GO'] = 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello World")\n}\n';
+
+
+    // --- initialize
+    $(document).ready(function(){
+        // submit post
+        $("#submit-post").click(function(){
+            runCode();
+        });
+
+        // show/hide code editor
+        $("#id_contain_code").click(function() {
+            showHideCodeEditor();
+        });
+
+        // download code
+        $("#download").click(function(){
+            download();
+        });
+
+        // change language
+        $("#lang").change(function(){
+            changeLanguage();
+        });
+
+        // change theme
+        $("#theme").change(function(){
+            changeTheme();
+        });
+        
+        makeEditor();
+    });
+
+    function makeEditor() {
+        ace.require("ace/ext/language_tools");
+        editor = ace.edit("editor");
+        var ongoing = false;
+        editor.setTheme("ace/theme/dawn");
+        editor.getSession().setTabSize(5);
+        editor.setFontSize(14);
+        editor.session.getSelection().clearSelection();
+        changeLanguage()
+        if(source_code == null) editor.setValue(language[selectedLang],-1);
+        else editor.setValue(source_code);
+    }
+
+
+    //To get the current contents in the editor
+    function updateContent(){
+        source_code = editor.getValue();
+    }
+
+    function runCode(){
+        var title = document.getElementById("id_title");
+        var text = document.getElementById("id_text");
+        if(title.value == "" || text.value == "" || title.value == null || text.value==null) {
+            alert("제목이나 내용을 확안히세요!");
+            return;
+        }
+
+        updateContent();
+
+        var form = document.getElementById('my-post-form');
+        document.getElementById("code").innerHTML = source_code;
+        form.submit();   
+    }
+
+    
+
+    function download() {
+        updateContent();
+
+        var e = {
+            "C":"c","CPP":"cpp","CLOJURE":"clj","CSS":"css","CSHARP":"cs",
+            "GO":"go","HASKELL":"hs","JAVA":"java","JAVASCRIPT":"js",
+            "LISP":"scm","OBJECTIVEC":"m","PERL":"pl","PHP":"php",
+            "PYTHON":"py","RUBY":"rb","R":"r","RUST":"rs","SCALA":"scala",
+            "TEXT":"txt"
+        };
+
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(source_code));
+        element.setAttribute('download', "file." + e[selectedLang]);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    function showHideCodeEditor() {
+        var code = document.getElementById('code-editor')
+        if(document.getElementById('id_contain_code').checked) {
+            code.classList.remove('code-editor-invisible');
+        } else {
+            code.classList.add('code-editor-invisible');
+        }
+    }
+
+    //When Changing the language
+    function changeLanguage() {
+        selectedLang = $("#lang").val();
+        document.getElementById("code").innerHTML = language[selectedLang];
+        editor.setValue(language[selectedLang],-1);
+
+        if(selectedLang == "C" || selectedLang == "CPP"){
+            editor.getSession().setMode("ace/mode/c_cpp");
+        }
+        else{
+            editor.getSession().setMode("ace/mode/" + selectedLang.toLowerCase());
+        }
+
+        editor.session.getSelection().clearSelection();
+    }
+
+    // When changing the theme
+    function changeTheme() {
+        themeSelected = $("#theme").val();
+        if(themeSelected == "Light"){
+            editor.setTheme("ace/theme/dawn");
+        }
+        else if(themeSelected == "Monokai"){
+            editor.setTheme("ace/theme/monokai");
+        }
+        else if(themeSelected == "Solarised Light"){
+            editor.setTheme("ace/theme/solarized_light");
+        }
+        else if(themeSelected == "Twilight"){
+            editor.setTheme("ace/theme/twilight");
+        }
+    }
+
+</script>
+
+
+
+{% endblock style %}
+
+
+
+{% block content %}
+
+	<h2>Edit Post</h2>
+	<form method="POST" class="post-form" id="my-post-form">{% csrf_token %}
+        {{ form.as_p }}
+
+		<div class="editor-container pt-5 code-editor-invisible" id="code-editor">
+
+			<div id="topbar">
+
+				<div class="lang-choose">
+					<select class="form-control" name="lang" id="lang">
+                        <option value="PYTHON" selected>Python (python 3.7)</option>
+                        <option value="R">R (RScript 3.6.2)</option>
+                        <option value="C">C (gcc 4.8.4)</option>
+                        <option value="CPP" >C++ (g++ 4.8.4)</option>
+                        <option value="CSHARP">C# (mono 3.2.8)</option>
+                        <option value="JAVA">Java (openjdk 1.7.0_09)</option>
+                        <option value="JAVASCRIPT">JavaScript (Rhino 1.7)</option>
+                        <option value="PHP">PHP (php 5.5.9)</option>
+                        <option value="GO">Go (go 1.4.2)</option>
+                        <option value="TEXTFILE">Text</option>
+                    </select>
+                </div> 
+                
+                <div id="settings">
+                    <div class="theme-choose">
+                        <select class="form-control" name="theme" id="theme">
+                            <option value="Light" selected>Light</option>
+                            <option value="Monokai">Monokai</option>
+                            <option value="Solarised Light">Solarised Light</option>
+                            <option value="Twilight">Twilight</option>
+                        </select>
+                    </div>
+
+                    <a class="" id="download">
+                        download code
+                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                    </a>
+                </div>
+                
+            </div>
+            
+            <textarea name="code" class="form-control" id="code" placeholder="code" rows="0" style="display:none;" ></textarea>
+
+			<pre id="editor"></pre>
+
+			<!-- <div id="editor-statusbar"></div> -->
+    	</div> 
+		
+		<button class="save btn btn-default" id="submit-post">Save</button>
+	</form>
+
+{% endblock %}

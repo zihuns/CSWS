@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script type="text/JavaScript" src="http://code.jquery.com/jquery-1.7.min.js"></script>
+<script language="javascript" type="text/javascript">
+  
+  $(function(){
+       //전체선택 체크박스 클릭
+        $("#allCheck").click(function(){
+
+             //만약 전체 선택 체크박스가 체크된상태일경우 
+             if($("#allCheck").prop("checked")) {
+
+                //해당화면에 전체 checkbox들을 체크해준다 
+                $("input[type=checkbox]").prop("checked",true);
+
+            // 전체선택 체크박스가 해제된 경우 
+            } else {
+                //해당화면에 모든 checkbox들의 체크를해제시킨다. 
+                $("input[type=checkbox]").prop("checked",false); 
+            } 
+        }) 
+    })
+
+
+</script>
+
+<style>
+        div {
+            width: 100%;
+            height: 100%;
+        }
+        div.top {
+            width: 100%;
+            float: top;
+            box-sizing: border-box;
+            
+            background: #e4b660;
+        }
+        div.bottom {
+            width: 100%;
+            float: bottom;
+            box-sizing: border-box;
+            
+            
+        }
+
+        .checkboxes input {
+                vertical-align: middle;
+            }
+</style>
+        
+<div>
+    <div class="top"  style="height: 100%">
+    <h2 align="center">Upload File</h2>
+
+        <form action="" method="POST" enctype="multipart/form-data" style="width: 10px;">
+          {% csrf_token %}
+              {{ form }}
+
+    <table cellpadding="0" cellspacing="0" border="0">      
+    <tr>        
+        <td style="width: 100px, padding:0px;" >
+            <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </td>
+
+        <td ><form method="POST" action="{% url 'delete_file' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Delete</button>
+        </td>
+        
+    </tr>
+   
+
+    <tr>        
+        <td colspan="2">현재 위치 : <a href="media/{{ request.user }}/index.html" >web_hosting/media/{{ request.user }}</a>
+        </td>
+    </tr>
+    <tr>        
+        <td colspan="2">사용 용량 : {{total_size|filesizeformat}}/{{max_size|filesizeformat}}
+        </td>
+    </tr>
+    </table>
+            <div class="progress" style="width: 150px;">
+            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 75%" aria-valuenow={{total_size}} aria-valuemin="0" aria-valuemax={{max_size}}></div>
+            </div>
+            <div class="bar-container">
+            <progress class="progressTag" value={{total_size}} max={{max_size}}></progress>
+            </div> 
+    </div>
+
+    <div class="bottom">
+            <h2 align="center">File List</h2>
+            
+        <table class="table" align="center" >
+            <thead class="thead-dark">
+                <tr>
+                    <th align="right" border="1"><input type="checkbox" id="allCheck"></th>
+                    <th style="width: 45%;">이름</th>
+                    <th style="width: 33%;">날짜</th>
+                    <th style="width: 20%;">크기</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                   
+                {% for file in files %}
+                <tr>
+                    <td align="center"><input type="checkbox" name="pk" value={{ file.pk }} align="right"></td>
+                    <td><a href="{{ file.file.url }}" download>
+                        {{ file.file }}
+                    </a></td>
+                    <td style="width: 185px;">{{ file.날짜 }}</td>
+                    <td style="width: 80px;">{{ file.file.size|filesizeformat }}</td>
+                    
+                </tr>
+                {% endfor %}
+                    
+                </form>
+
+            </tbody>
+        </table>
+    
+    
+        </div>
+    </div>
+    
+{% endblock %}
+        
+    {% block script %}
+
+    
+    {% endblock %}
+    

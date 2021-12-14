@@ -1,0 +1,24 @@
+{% extends "boards/base_boards.html" %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div>
+	<h2>{{ title }}</h2>
+</div>
+
+
+{% for subject in subjects %}
+	<h3><a href="{% url 'boards:subject_detail' title=subject.subject.title year=subject.year class_no=subject.class_no %}">{{ title }} {{ subject.class_no}}분반 ({{ subject.year }})</a></h3>
+{% endfor %}
+
+<br><br>
+<div>
+	<div><h1>게시판</h1></div>
+	<a href="{% url 'boards:post_new' title=title %}">글쓰기</a>
+	{% for post in posts %}
+	<h3><a href="{% url 'boards:post_detail' title=title pk=post.pk %}">{{ post.title }}</a></h3>
+	{% endfor %}
+</div>
+
+{% endblock content %}
